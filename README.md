@@ -9,7 +9,11 @@
    ```
 
 3. Run the following command to install dependencies:
-   > `npm run install-deps`
+   ```bash 
+   npm run install-deps
+   ```
 4. Run the following command to start the project:
-   > `npm run start`
+   ```bash 
+   npm run start
+   ```
 5. open <http://localhost:3000> in your browser
