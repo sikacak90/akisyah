@@ -1,0 +1,18 @@
+{
+  "name": "akisyah",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "install-deps": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "client:dev": "cd frontend && npm run start",
+    "backend:dev": "cd backend && npm run dev",
+    "dev": "concurrently --kill-others --names \"backend,frontend\" -c \"auto\" \"npm:backend:dev\" \"npm:client:dev\"",
+    "client:build": "cd frontend && npm run build",
+    "backend:production": "cd backend && npm run start",
+    "start": "npm run backend:production"
+  },
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

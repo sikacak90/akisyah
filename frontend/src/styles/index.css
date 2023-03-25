@@ -1,0 +1,12 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.MuiDrawer-root .MuiPaper-root {
+  border: none;
+}
+
+body {
+  background: #f2f2f2 !important;
+}

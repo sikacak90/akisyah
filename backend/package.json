@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=production node ./bin/www",
+    "dev": "PORT=3500 DEBUG=backend:* nodemon ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.17.3",
+    "helmet": "^6.0.1",
+    "http-errors": "~1.6.3",
+    "joi": "^17.8.3",
+    "memorystore": "^1.6.7",
+    "mongoose": "^7.0.1",
+    "morgan": "~1.9.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  }
+}
