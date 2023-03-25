@@ -6,10 +6,10 @@
    ```env
    MONGO_DB_URI=#your mongo db uri
    SESSION_SECRET=asdfl1asdf%jvo4^&a@sdf
-   PORT=3500
    ```
 
 3. Run the following command to install dependencies:
    > `npm run install-deps`
 4. Run the following command to start the project:
    > `npm run start`
+5. open <http://localhost:3000> in your browser
