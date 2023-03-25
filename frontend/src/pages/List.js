@@ -6,6 +6,7 @@ import ListItem from "../components/ListItem";
 import RowDivider from "../components/RowDivider";
 import { sessionContext } from "../features/Session";
 import { socket } from "../socket.io/socket";
+import { getCurrentTime } from "../utils/utils";
 
 function copyListItems(array) {
   const formattedText = array
@@ -53,7 +54,8 @@ function List() {
     function handleEvent(data) {
       console.log("data", data);
       setEvents((prev) => {
-        return [...prev, data];
+        data.time = getCurrentTime();
+        return [data, ...prev];
       });
     }
     socket.on(webhookID, handleEvent);
@@ -153,6 +155,7 @@ function List() {
                     imgUrl={event["avatar_url"]}
                     name={event["value1"]}
                     username={event["username"]}
+                    time={event["time"]}
                   />
                   <RowDivider />
                 </React.Fragment>

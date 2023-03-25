@@ -8,12 +8,16 @@
    SESSION_SECRET=asdfl1asdf%jvo4^&a@sdf
    ```
 
-3. Run the following command to install dependencies:
-   ```bash 
+3. Run the following command to install dependencies **(First Time Only)** :
+
+   ```bash
    npm run install-deps
    ```
+
 4. Run the following command to start the project:
-   ```bash 
+
+   ```bash
    npm run start
    ```
+
 5. open <http://localhost:3000> in your browser

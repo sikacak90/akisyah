@@ -4,15 +4,13 @@ const sessionMiddleware = require("../middlewares/sessionMiddleware");
 // key: socketID, value: userID
 var onlineUsers = new Map();
 
-// Check if a user is connected with a given socketId
+// Check if a user is connected with a given userID
 function isUserConnected(userID) {
   let socketID = onlineUsers.get(userID);
 
   if (!socketID) {
     return false;
   }
-  console.log("heart");
-  console.log("hear");
 
   if (io.sockets.sockets.has(socketID)) {
     return io.sockets.sockets.get(socketID);

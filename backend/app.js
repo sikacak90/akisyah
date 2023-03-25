@@ -49,7 +49,11 @@ const app = express();
 app.use(cors());
 
 // Helmet.js
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // Set up middlewares for passport.js
 app.use(sessionMiddleware);
