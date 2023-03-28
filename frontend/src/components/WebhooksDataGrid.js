@@ -31,7 +31,7 @@ const columns = [
   },
 ];
 
-export default function WebhooksDataGrid({ apiRef }) {
+export default function WebhooksDataGrid({ apiRef, setSnackbar }) {
   const { session } = useContext(sessionContext);
   const navigate = useNavigate();
   useEffect(() => {
@@ -79,7 +79,12 @@ export default function WebhooksDataGrid({ apiRef }) {
         onCellClick={(params) => {
           if (params.field === 'url') {
             navigator.clipboard.writeText(params.row.url);
-            alert('Link copied to clipboard.');
+            setSnackbar({
+              open: true,
+              message: 'Link copied to clipboard.',
+              severity: 'success',
+              title: 'Success',
+            });
             return;
           }
           if (params.field === '__check__') return;

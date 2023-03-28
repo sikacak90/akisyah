@@ -221,7 +221,7 @@ export default function Dashboard() {
             </Box>
           </Box>
         </Box>
-        <WebhooksDataGrid apiRef={apiRef} />
+        <WebhooksDataGrid apiRef={apiRef} setSnackbar={setSnackbar} />
         <Modal
           open={newWebhookModelOpen}
           onClose={() => setNewWebhookModelOpen(false)}
