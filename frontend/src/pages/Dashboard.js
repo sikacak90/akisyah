@@ -125,7 +125,7 @@ export default function Dashboard() {
             updateWebhooks({ _id: value.id }, 'delete');
             setSnackbar({
               open: true,
-              message: 'Webhook created successfully.',
+              message: 'Webhook deleted successfully.',
               severity: 'success',
               title: 'Success',
             });
