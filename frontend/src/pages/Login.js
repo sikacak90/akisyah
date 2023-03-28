@@ -1,18 +1,22 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {
+  Alert,
+  AlertTitle,
   Box,
   Button,
   Checkbox,
   FormControlLabel,
+  Snackbar,
   Typography,
-  useMediaQuery,
-} from "@mui/material";
-import useTheme from "@mui/material/styles/useTheme";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import * as yup from "yup";
-import logo from "../assets/akisyah_logo/black.svg";
+  useMediaQuery
+} from '@mui/material';
+import useTheme from '@mui/material/styles/useTheme';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import React, { useCallback, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+import logo from '../assets/akisyah_logo/black.svg';
+import axios from '../utils/axios-client';
 
 const TextInputStyled = styled.input`
   border: none;
@@ -34,37 +38,57 @@ const InputElement = ({ field, form, ...props }) => {
   );
 };
 
+const CheckboxElement = ({ field, form, ...props }) => {
+  return <Checkbox {...field} {...props} theme={props.theme} />;
+};
+
 function Login() {
   const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width:500px)");
+  const isMobile = useMediaQuery('(max-width:500px)');
   const navigate = useNavigate();
+  const INITIAL_SNACKBAR = {
+    open: false,
+    message: '',
+    severity: 'success',
+    title: 'Success',
+  };
+  const [snackbar, setSnackbar] = useState(INITIAL_SNACKBAR);
   const initialValues = {
-    email: "",
-    password: "",
+    email: '',
+    password: '',
+    rememberMe: false,
   };
 
   const validationSchema = yup.object({
     email: yup.string().email().required(),
     password: yup.string().min(6).required(),
+    rememberMe: yup.boolean(),
   });
 
   const handleLogin = useCallback(
     (values, actions) => {
-      console.log(values);
-      fetch("/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      }).then((res) => {
-        if (res.ok && res.redirected) {
-          console.log("redirect");
-          console.log(res.url);
-          const url = new URL(res.url);
-          navigate(url.pathname);
-        }
-      });
+      axios
+        .post('/auth/login', values)
+        .then((res) => {
+          if (res.data && !res.data.error) {
+            actions.setSubmitting(false);
+            navigate('/dashboard');
+          }
+        })
+        .catch((err) => {
+          console.log('🚀 ~ file: Login.js:81 ~ Login ~ err:', err);
+          const message =
+            err?.response && err.response.status === 401
+              ? err.response.data
+              : err.message;
+          setSnackbar({
+            open: true,
+            message: message,
+            severity: 'error',
+            title: 'Error',
+          });
+          console.log(err);
+        });
     },
     [navigate]
   );
@@ -72,39 +96,59 @@ function Login() {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        width: '100vw',
       }}
     >
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        direction="up"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        onClose={() => {
+          setSnackbar(INITIAL_SNACKBAR);
+        }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+          onClose={() => {
+            setSnackbar(INITIAL_SNACKBAR);
+          }}
+        >
+          <AlertTitle>{snackbar.title}</AlertTitle>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "white",
-          padding: isMobile ? "2rem 1rem" : "2rem 4rem",
-          width: isMobile ? "100%" : "unset",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'white',
+          padding: isMobile ? '2rem 1rem' : '2rem 4rem',
+          width: isMobile ? '100%' : 'unset',
           borderRadius: theme.shape.borderRadius - 2,
         }}
       >
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "180px",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '180px',
           }}
         >
           <img
             style={{
-              height: "100%",
-              width: "100%",
-              objectFit: "contain",
+              height: '100%',
+              width: '100%',
+              objectFit: 'contain',
             }}
             src={logo}
             alt="Akisyah's Logo"
@@ -112,8 +156,8 @@ function Login() {
         </Box>
         <Typography
           variant="h5"
-          component={"h1"}
-          sx={{ margin: isMobile ? "2rem 0" : "2rem 3rem" }}
+          component={'h1'}
+          sx={{ margin: isMobile ? '2rem 0' : '2rem 3rem' }}
         >
           Login To Your Account
         </Typography>
@@ -124,32 +168,26 @@ function Login() {
         >
           <Box
             component={Form}
-            sx={{ width: "100%" }}
+            sx={{ width: '100%' }}
             action="/api/login"
             method="post"
           >
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                marginBottom: "1rem",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
               <Typography
-                component={"label"}
+                component={'label'}
                 htmlFor="email"
-                color={"GrayText"}
+                color={'GrayText'}
                 sx={{ mb: 1 }}
               >
                 Email
               </Typography>
-              {/* <TextInputStyled
-                type="email"
-                name="email"
-                theme={theme}
-                placeholder={"cooper@example.com"}
-              /> */}
               <Field
                 type="email"
                 component={InputElement}
@@ -169,25 +207,20 @@ function Login() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                marginBottom: "1rem",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
               <Typography
-                component={"label"}
+                component={'label'}
                 htmlFor="password"
-                color={"GrayText"}
+                color={'GrayText'}
                 sx={{ mb: 1 }}
               >
                 Password
               </Typography>
-              {/* <TextInputStyled
-                  type="password"
-                  name="password"
-                  theme={theme}
-                /> */}
               <Field
                 type="password"
                 component={InputElement}
@@ -206,35 +239,37 @@ function Login() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
               <FormControlLabel
-                control={<Checkbox />}
+                control={
+                  <Field name="rememberMe" component={CheckboxElement} />
+                }
                 label="Remember Me"
                 labelPlacement="end"
                 sx={{
-                  fontWeight: "300",
+                  fontWeight: '300',
                   color: theme.palette.darkGray.main,
                 }}
               />
-              <Typography
-                component={"a"}
-                href="/forgot-password"
-                sx={{ ml: 2 }}
-                color={"GrayText"}
-              >
-                Forgot Password?
+              <Typography sx={{ ml: 2 }} color={'GrayText'}>
+                <Link
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                  to="/forget-password"
+                >
+                  Forgot Password?
+                </Link>
               </Typography>
             </Box>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: "1rem",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '1rem',
               }}
             >
               <Button
@@ -242,7 +277,7 @@ function Login() {
                 variant="contained"
                 fullWidth={true}
                 sx={{
-                  borderBottom: "4px solid #3687D9",
+                  borderBottom: '4px solid #3687D9',
                 }}
               >
                 Login
@@ -250,40 +285,37 @@ function Login() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Typography
-                component={"p"}
+                component={'p'}
                 sx={{
-                  textAlign: "center",
-                  fontSize: "0.8rem",
-                  fontWeight: "300",
-                  color: "GrayText",
+                  textAlign: 'center',
+                  fontSize: '.9rem',
+                  fontWeight: '300',
+                  color: 'GrayText',
                   mt: 2,
                 }}
               >
                 Don't have an account?
               </Typography>
               <Typography
-                color={"primary"}
+                color={'primary'}
+                component={Link}
+                to="/register"
                 sx={{
-                  textAlign: "center",
-                  fontSize: "0.8rem",
-                  fontWeight: "400",
-                  textDecoration: "none",
+                  textAlign: 'center',
+                  fontSize: '.9rem',
+                  fontWeight: '400',
+                  textDecoration: 'none',
                   mt: 2,
                   ml: 1,
                 }}
               >
-                <Link
-                  style={{ textDecoration: "none", color: "inherit" }}
-                  to="/register"
-                >
-                  Sign Up
-                </Link>
+                Sign Up
               </Typography>
             </Box>
           </Box>

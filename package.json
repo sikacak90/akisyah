@@ -12,7 +12,7 @@
     "backend:production": "cd backend && npm run start",
     "start": "npm run backend:production"
   },
-  "dependencies": {
+  "devDependencies": {
     "concurrently": "^7.6.0"
   }
 }

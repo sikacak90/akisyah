@@ -1,51 +1,51 @@
-import MenuIcon from "@mui/icons-material/Menu";
-import MuiAppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Toolbar from "@mui/material/Toolbar";
-import React, { useEffect } from "react";
-import AvatarSVG from "../assets/48px.svg";
-import LogoSVG from "../assets/akisyah_logo/black.svg";
-import NotificationSVG from "../assets/Bell + Notification.svg";
-import GridSVG from "../assets/Grid.svg";
-import MenuSVG from "../assets/Menu.svg";
-import SettingSVG from "../assets/Settings.svg";
-
-import { useMediaQuery } from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
+import MenuIcon from '@mui/icons-material/Menu';
+import MuiAppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Toolbar from '@mui/material/Toolbar';
+import React, { useEffect, useContext } from 'react';
+import AvatarSVG from '../assets/48px.svg';
+import LogoSVG from '../assets/akisyah_logo/black.svg';
+import NotificationSVG from '../assets/Bell + Notification.svg';
+import GridSVG from '../assets/Grid.svg';
+import MenuSVG from '../assets/Menu.svg';
+import SettingSVG from '../assets/Settings.svg';
+import { useMediaQuery } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { sessionContext } from "../features/Session";
 
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
-  transition: theme.transitions.create("width", {
+  transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  overflowX: "hidden",
+  overflowX: 'hidden',
 });
 
 const closedMixin = (theme) => ({
-  transition: theme.transitions.create("width", {
+  transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  overflowX: "hidden",
+  overflowX: 'hidden',
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
+  [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   // justifyContent: "flex-end",
   // padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
@@ -53,17 +53,17 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
+  transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -71,37 +71,37 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   width: drawerWidth,
   flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
   ...(open && {
     ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
   ...(!open && {
     ...closedMixin(theme),
-    "& .MuiDrawer-paper": closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
   }),
 }));
 
 function Header() {
-  const isDesktop = useMediaQuery("(min-width:768px)");
+  const isDesktop = useMediaQuery('(min-width:768px)');
   const [open, setOpen] = React.useState(
-    window.localStorage.getItem("drawer") === "true"
+    window.localStorage.getItem('drawer') === 'true'
   );
+  const { logout } = useContext(sessionContext);
   const theme = useTheme();
   useEffect(() => {
     if (!isDesktop) {
-      console.log(isDesktop);
       setOpen(false);
     }
   }, [isDesktop]);
 
   useEffect(() => {
-    window.localStorage.setItem("drawer", open);
+    window.localStorage.setItem('drawer', open);
   }, [open]);
 
   const handleDrawerOpen = () => {
@@ -117,8 +117,8 @@ function Header() {
       <AppBar
         sx={{
           background: theme.palette.gray.main,
-          boxShadow: "none",
-          border: "none",
+          boxShadow: 'none',
+          border: 'none',
         }}
         position="fixed"
         open={open}
@@ -131,23 +131,23 @@ function Header() {
             edge="start"
             sx={{
               marginRight: 5,
-              ...(open && { display: "none" }),
+              ...(open && { display: 'none' }),
             }}
           >
             <MenuIcon />
           </IconButton>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: open ? "space-between" : "flex-end",
-              alignItems: "center",
-              width: "100%",
+              display: 'flex',
+              justifyContent: open ? 'space-between' : 'flex-end',
+              alignItems: 'center',
+              width: '100%',
             }}
           >
             <IconButton
               onClick={handleDrawerClose}
               sx={{
-                display: !open ? "none" : "block",
+                display: !open ? 'none' : 'block',
                 height: 40,
                 width: 40,
                 mx: 2,
@@ -157,22 +157,20 @@ function Header() {
             </IconButton>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifySelf: "flex-end",
+                display: 'flex',
+                alignItems: 'center',
+                justifySelf: 'flex-end',
               }}
             >
               <Box
                 sx={{
                   minWidth: 0,
                   mr: 3,
-                  justifyContent: "center",
-                  cursor: "pointer",
+                  justifyContent: 'center',
+                  cursor: 'pointer',
                   color: theme.palette.darkGray.main,
                 }}
-                onClick={() => {
-                  window.location.href = "/auth/logout/";
-                }}
+                onClick={()=>logout()}
               >
                 Logout
               </Box>
@@ -180,7 +178,7 @@ function Header() {
                 sx={{
                   minWidth: 0,
                   mr: 3,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 <img src={SettingSVG} alt="Grid" />
@@ -189,7 +187,7 @@ function Header() {
                 sx={{
                   minWidth: 0,
                   mr: 3,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 <img src={NotificationSVG} alt="Grid" />
@@ -198,7 +196,7 @@ function Header() {
                 sx={{
                   minWidth: 0,
                   mr: 3,
-                  justifyContent: "center",
+                  justifyContent: 'center',
                 }}
               >
                 <img src={AvatarSVG} alt="Grid" width={40} height={40} />
@@ -211,13 +209,13 @@ function Header() {
         <DrawerHeader
           sx={{
             background: theme.palette.gray.main,
-            border: "none",
+            border: 'none',
             px: 6,
             py: 3,
           }}
         >
           <img
-            style={{ objectFit: "contain", width: "100%" }}
+            style={{ objectFit: 'contain', width: '100%' }}
             src={LogoSVG}
             alt="Logo"
           />
@@ -225,29 +223,29 @@ function Header() {
         <List
           sx={{
             background: theme.palette.gray.main,
-            border: "none",
-            height: "100%",
+            border: 'none',
+            height: '100%',
           }}
         >
-          <ListItem disablePadding sx={{ display: "block" }}>
+          <ListItem disablePadding sx={{ display: 'block' }}>
             <ListItemButton
               sx={{
                 minHeight: 48,
-                justifyContent: open ? "initial" : "center",
+                justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : "auto",
-                  justifyContent: "center",
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
                 }}
               >
                 <img src={GridSVG} alt="Grid" />
               </ListItemIcon>
               <ListItemText
-                primary={"Dashboard"}
+                primary={'Dashboard'}
                 sx={{ opacity: open ? 1 : 0 }}
               />
             </ListItemButton>

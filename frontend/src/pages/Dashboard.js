@@ -1,23 +1,37 @@
-import { MenuItem, TextField } from "@mui/material";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import Modal from "@mui/material/Modal";
-import { useTheme } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import { useGridApiRef } from "@mui/x-data-grid";
-import { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import WebhooksDataGrid from "../components/WebhooksDataGrid";
-import { sessionContext } from "../features/Session";
-import { socket } from "../socket.io/socket";
+import {
+  Alert,
+  AlertTitle,
+  MenuItem,
+  Modal,
+  Snackbar,
+  TextField,
+} from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import { useGridApiRef } from '@mui/x-data-grid';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import WebhooksDataGrid from '../components/WebhooksDataGrid';
+import { sessionContext } from '../features/Session';
+import { socket } from '../socket.io/socket';
+import axios from '../utils/axios-client';
 
 export default function Dashboard() {
-  const { session, fetchUserAuth } = useContext(sessionContext);
+  const { session, fetchUserAuth, updateWebhooks } = useContext(sessionContext);
   const theme = useTheme();
   const navigate = useNavigate();
   const [newWebhookModelOpen, setNewWebhookModelOpen] = useState(false);
+  const INITIAL_SNACKBAR = {
+    open: false,
+    message: '',
+    severity: 'success',
+    title: 'Success',
+  };
+  const [snackbar, setSnackbar] = useState(INITIAL_SNACKBAR);
   const apiRef = useGridApiRef();
   const nameInputRef = useRef(null);
   const typeInputRef = useRef(null);
@@ -34,12 +48,14 @@ export default function Dashboard() {
 
     function tryReconnect() {
       setTimeout(() => {
-        console.log("trying to reconnect...");
-        socket.open((err) => {
-          if (err) {
-            tryReconnect();
-          }
-        });
+        if (session.isLoggedIn) {
+          console.log('trying to reconnect...');
+          socket.open((err) => {
+            if (err) {
+              tryReconnect();
+            }
+          });
+        }
       }, 2000);
     }
 
@@ -47,19 +63,19 @@ export default function Dashboard() {
       tryReconnect();
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
     };
-  }, [isConnected]);
+  }, [isConnected, session.isLoggedIn]);
 
   useEffect(() => {
     if (!session.isLoggedIn) {
       fetchUserAuth().then((data) => {
-        if (!data) navigate("/");
+        if (!data) navigate('/');
       });
     }
   }, [session.isLoggedIn, navigate, fetchUserAuth]);
@@ -67,58 +83,71 @@ export default function Dashboard() {
   const handleCreateURL = (e) => {
     const webhookName = nameInputRef.current.value;
     const webhookType = typeInputRef.current.value;
-    if (!webhookName || !webhookType) return alert("All fields are required.");
-    fetch("/api/createURL", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: webhookName, EventType: webhookType }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        apiRef.current.updateRows([
-          {
-            id: data._id,
-            name: data.name,
-            url:
-              window.location.protocol +
-              "//" +
-              window.location.host +
-              "/" +
-              data.URL,
-            type: data.EventType,
-            isOpen: "open",
-          },
-        ]);
-        setNewWebhookModelOpen(false);
-        fetchUserAuth();
+    if (!webhookName || !webhookType) return alert('All fields are required.');
+    axios
+      .post('/api/createURL', { name: webhookName, EventType: webhookType })
+      .then((res) => {
+        if (res.status === 200) {
+          // update in SessionContext
+          updateWebhooks(res.data, 'add');
+          setNewWebhookModelOpen(false);
+          setSnackbar({
+            open: true,
+            message: 'Webhook created successfully.',
+            severity: 'success',
+            title: 'Success',
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(
+          '🚀 ~ file: Dashboard.js:103 ~ handleCreateURL ~ err:',
+          err
+        );
+        setSnackbar({
+          open: true,
+          message: 'Oops! Something went wrong',
+          severity: 'error',
+          title: 'Error',
+        });
       });
   };
 
   const handleDeleteSelected = () => {
     const selectedRows = apiRef.current.getSelectedRows();
-    for (const [key, value] of selectedRows) {
-      console.log(key, value);
-      fetch("/api/deleteURL", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ webhookID: value.id }),
-      }).then((res) => {
-        if (res.ok) {
-          apiRef.current.updateRows([{ id: value.id, _action: "delete" }]);
-          fetchUserAuth();
-        } else {
-          console.error("Could not delete.");
-        }
-      });
+    for (const [, value] of selectedRows) {
+      axios
+        .post('/api/deleteURL', { webhookID: value.id })
+        .then((res) => {
+          if (res.status === 200) {
+            apiRef.current.updateRows([{ id: value.id, _action: 'delete' }]);
+            // update in SessionContext
+            updateWebhooks({ _id: value.id }, 'delete');
+            setSnackbar({
+              open: true,
+              message: 'Webhook created successfully.',
+              severity: 'success',
+              title: 'Success',
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(
+            '🚀 ~ file: Dashboard.js:166 ~ handleDeleteSelected ~ err:',
+            err
+          );
+          setSnackbar({
+            open: true,
+            message: 'Oops! Something went wrong',
+            severity: 'error',
+            title: 'Error',
+          });
+        });
     }
   };
 
   return (
-    <Box sx={{ display: "flex", m: 4 }}>
+    <Box sx={{ display: 'flex', m: 4 }}>
       <CssBaseline />
       <Header />
       <Box
@@ -126,29 +155,49 @@ export default function Dashboard() {
         sx={{
           flexGrow: 1,
           p: 3,
-          marginTop: "3rem",
-          borderRadius: "8px",
-          background: "white",
-          height: "100%",
+          marginTop: '3rem',
+          borderRadius: '8px',
+          background: 'white',
+          height: '100%',
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          direction="up"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          onClose={() => {
+            setSnackbar(INITIAL_SNACKBAR);
+          }}
+        >
+          <Alert
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+            onClose={() => {
+              setSnackbar(INITIAL_SNACKBAR);
+            }}
+          >
+            <AlertTitle>{snackbar.title}</AlertTitle>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h5" component="h2">
-            My Webhooks {isConnected ? "Connected" : "Disconnected"}
+            My Webhooks {isConnected ? 'Connected' : 'Disconnected'}
           </Typography>
-          <Box display={"flex"}>
+          <Box display={'flex'}>
             <Box
               sx={{
                 background: theme.palette.error.main,
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
                 borderRadius: theme.shape.borderRadius - 2,
                 mr: 2,
                 px: 2,
-                fontSize: "0.7rem",
+                fontSize: '0.7rem',
               }}
               onClick={() => handleDeleteSelected()}
             >
@@ -157,11 +206,11 @@ export default function Dashboard() {
             <Box
               sx={{
                 background: theme.palette.primary.main,
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
                 width: 48,
                 height: 40,
                 borderRadius: theme.shape.borderRadius - 2,
@@ -181,12 +230,12 @@ export default function Dashboard() {
         >
           <Box
             sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
               width: 400,
-              bgcolor: "background.paper",
+              bgcolor: 'background.paper',
               boxShadow: 24,
               borderRadius: 2,
               pt: 2,
@@ -205,14 +254,15 @@ export default function Dashboard() {
             <Box
               sx={{
                 mt: 2,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 gap: 2,
               }}
             >
               <TextField
+                autoFocus={true}
                 inputRef={nameInputRef}
                 id="name-basic"
                 label="name"

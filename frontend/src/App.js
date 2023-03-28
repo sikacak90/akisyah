@@ -1,7 +1,7 @@
-import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { sessionContext } from "./features/Session";
-import Login from "./pages/Login";
+import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { sessionContext } from './features/Session';
+import Login from './pages/Login';
 
 function App() {
   const { fetchUserAuth, session } = useContext(sessionContext);
@@ -11,7 +11,7 @@ function App() {
     fetchUserAuth()
       .then(() => {
         if (session.isLoggedIn) {
-          navigate("/dashboard");
+          navigate('/dashboard');
         }
       })
       .catch((error) => {

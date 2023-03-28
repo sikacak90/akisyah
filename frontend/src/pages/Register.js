@@ -1,11 +1,20 @@
-import styled from "@emotion/styled";
-import { Box, Button, Typography, useMediaQuery } from "@mui/material";
-import useTheme from "@mui/material/styles/useTheme";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useCallback } from "react";
-import { Link } from "react-router-dom";
-import * as yup from "yup";
-import logo from "../assets/akisyah_logo/black.svg";
+import styled from '@emotion/styled';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Snackbar,
+  Typography,
+  useMediaQuery,
+} from '@mui/material';
+import useTheme from '@mui/material/styles/useTheme';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import React, { useCallback, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
+import logo from '../assets/akisyah_logo/black.svg';
+import axios from '../utils/axios-client';
 
 const TextInputStyled = styled.input`
   border: none;
@@ -29,11 +38,19 @@ const InputElement = ({ field, form, ...props }) => {
 
 function Register() {
   const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width:500px)");
+  const isMobile = useMediaQuery('(max-width:500px)');
+  const navigate = useNavigate();
+  const INITIAL_SNACKBAR = {
+    open: false,
+    message: '',
+    severity: 'success',
+    title: 'Success',
+  };
+  const [snackbar, setSnackbar] = useState(INITIAL_SNACKBAR);
   const initialValues = {
-    email: "",
-    password: "",
-    confirmPassword: "",
+    email: '',
+    password: '',
+    confirmPassword: '',
   };
 
   const validationSchema = yup.object({
@@ -41,63 +58,90 @@ function Register() {
     password: yup.string().min(6).required(),
     confirmPassword: yup
       .string()
-      .oneOf([yup.ref("password"), null], "Password must match."),
+      .oneOf([yup.ref('password'), null], 'Password must match.'),
   });
 
-  const handleRegister = useCallback((values, actions) => {
-    console.log(values);
-    fetch("/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    }).then((res) => {
-      if (res.ok && res.redirected) {
-        console.log("redirect");
-        console.log(res.url);
-        // window.location.replace(res.url);
-        window.location.assign(res.url);
-      }
-    });
-  }, []);
+  const handleRegister = useCallback(
+    (values, actions) => {
+      axios
+        .post('/auth/signup', values)
+        .then((res) => {
+          if (res && res.status === 200) {
+            navigate('/');
+          }
+        })
+        .catch((err) => {
+          const message =
+            err?.response && err.response.status === 409
+              ? err.response.data.error
+              : err.message;
+          setSnackbar({
+            open: true,
+            message: message,
+            severity: 'error',
+            title: 'Error',
+          });
+        });
+    },
+    [navigate]
+  );
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        width: '100vw',
       }}
     >
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        direction="up"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        onClose={() => {
+          setSnackbar(INITIAL_SNACKBAR);
+        }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+          onClose={() => {
+            setSnackbar(INITIAL_SNACKBAR);
+          }}
+        >
+          <AlertTitle>{snackbar.title}</AlertTitle>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "white",
-          padding: isMobile ? "2rem 1rem" : "2rem 4rem",
-          width: isMobile ? "100%" : "unset",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'white',
+          padding: isMobile ? '2rem 1rem' : '2rem 4rem',
+          width: isMobile ? '100%' : 'unset',
           borderRadius: theme.shape.borderRadius - 2,
         }}
       >
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "180px",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '180px',
           }}
         >
           <img
             style={{
-              height: "100%",
-              width: "100%",
-              objectFit: "contain",
+              height: '100%',
+              width: '100%',
+              objectFit: 'contain',
             }}
             src={logo}
             alt="Akisyah's Logo"
@@ -105,8 +149,8 @@ function Register() {
         </Box>
         <Typography
           variant="h5"
-          component={"h1"}
-          sx={{ margin: isMobile ? "2rem 0" : "2rem 3rem" }}
+          component={'h1'}
+          sx={{ margin: isMobile ? '2rem 0' : '2rem 3rem' }}
         >
           Create a new account
         </Typography>
@@ -117,22 +161,22 @@ function Register() {
         >
           <Box
             component={Form}
-            sx={{ width: "100%" }}
+            sx={{ width: '100%' }}
             action="/api/login"
             method="post"
           >
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                marginBottom: "1rem",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
               <Typography
-                component={"label"}
+                component={'label'}
                 htmlFor="email"
-                color={"GrayText"}
+                color={'GrayText'}
                 sx={{ mb: 1 }}
               >
                 Email
@@ -156,16 +200,16 @@ function Register() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                marginBottom: "1rem",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
               <Typography
-                component={"label"}
+                component={'label'}
                 htmlFor="password"
-                color={"GrayText"}
+                color={'GrayText'}
                 sx={{ mb: 1 }}
               >
                 Password
@@ -188,16 +232,16 @@ function Register() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                marginBottom: "1rem",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
               <Typography
-                component={"label"}
+                component={'label'}
                 htmlFor="password"
-                color={"GrayText"}
+                color={'GrayText'}
                 sx={{ mb: 1 }}
               >
                 Confirm Password
@@ -220,10 +264,10 @@ function Register() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: "1rem",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '1rem',
               }}
             >
               <Button
@@ -231,7 +275,7 @@ function Register() {
                 variant="contained"
                 fullWidth={true}
                 sx={{
-                  borderBottom: "4px solid #3687D9",
+                  borderBottom: '4px solid #3687D9',
                 }}
               >
                 Signup
@@ -239,40 +283,37 @@ function Register() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Typography
-                component={"p"}
+                component={'p'}
                 sx={{
-                  textAlign: "center",
-                  fontSize: "0.8rem",
-                  fontWeight: "300",
-                  color: "GrayText",
+                  textAlign: 'center',
+                  fontSize: '.9rem',
+                  fontWeight: '300',
+                  color: 'GrayText',
                   mt: 2,
                 }}
               >
                 Don't have an account?
               </Typography>
               <Typography
-                color={"primary"}
+                component={Link}
+                to="/"
+                color={'primary'}
                 sx={{
-                  textAlign: "center",
-                  fontSize: "0.8rem",
-                  fontWeight: "400",
-                  textDecoration: "none",
+                  textAlign: 'center',
+                  fontSize: '.9rem',
+                  fontWeight: '400',
+                  textDecoration: 'none',
                   mt: 2,
                   ml: 1,
                 }}
               >
-                <Link
-                  style={{ textDecoration: "none", color: "inherit" }}
-                  to="/"
-                >
-                  Login
-                </Link>
+                Login
               </Typography>
             </Box>
           </Box>
