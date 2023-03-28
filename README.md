@@ -5,10 +5,10 @@
 
    ```env
    MONGO_DB_URI=#your mongo db uri
-   SESSION_SECRET=asdfl1asdf%jvo4^&a@sdf
+   JWT_SECRET=asdfl1asdf%jvo4^&a@sdf
    ```
 
-3. Run the following command to install dependencies **(First Time Only)** :
+3. Run the following command to install dependencies :
 
    ```bash
    npm run install-deps
