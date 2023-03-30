@@ -1,9 +1,9 @@
 import { Box, Button, Typography, useMediaQuery } from '@mui/material';
+import { yellow } from '@mui/material/colors';
 import useTheme from '@mui/material/styles/useTheme';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ListItem from '../components/ListItem';
-import RowDivider from '../components/RowDivider';
 import { sessionContext } from '../features/Session';
 import { socket } from '../socket.io/socket';
 import { EVENT_TYPES } from '../utils/constants';
@@ -30,6 +30,7 @@ function List() {
   const theme = useTheme();
   const { session } = useContext(sessionContext);
   const isMobile = useMediaQuery('(max-width:500px)');
+  const isTablet = useMediaQuery('(max-width:1000px)');
   const navigate = useNavigate();
   const { eventType, webhookID } = useParams();
   const location = useLocation();
@@ -68,8 +69,10 @@ function List() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
         pb: 5,
+        color: theme.palette.text.primary,
       }}
     >
       <Typography
@@ -86,22 +89,22 @@ function List() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: 'white',
-          padding: isMobile ? '2rem 1rem' : '2rem 4rem',
-          width: isMobile ? '100%' : 'unset',
+          background: theme.palette.background.default,
+          padding: isMobile || isTablet ? '2rem 1rem' : '2rem',
+          width: isMobile || isTablet ? '100%' : theme.breakpoints.values.md,
           borderRadius: theme.shape.borderRadius - 2,
         }}
       >
         <Box
           sx={{
-            margin: isMobile ? '2rem 0' : '2rem 8rem',
+            margin: isMobile ? '2rem 0' : '0 0 1rem 0',
             textAlign: 'center',
           }}
         >
           <Typography variant="h5" component={'h1'}>
             {name}
           </Typography>
-          <Typography variant="body1" component={'p'}>
+          <Typography variant="body1" component={'p'} color={yellow['A200']}>
             Total Users : {events.length}
           </Typography>
         </Box>
@@ -116,7 +119,7 @@ function List() {
               variant="caption"
               component={'h1'}
               fontWeight="400"
-              color={'GrayText'}
+              color={theme.palette.text.secondary}
             >
               Username
             </Typography>
@@ -124,7 +127,7 @@ function List() {
               variant="caption"
               component={'h1'}
               fontWeight="400"
-              color={'GrayText'}
+              color={theme.palette.text.secondary}
             >
               Time
             </Typography>
@@ -133,7 +136,7 @@ function List() {
             display={'flex'}
             sx={{
               flexDirection: 'column',
-              height: '45vh',
+              height: '46vh',
               overflow: 'scroll',
               '::-webkit-scrollbar': {
                 display: 'none',
@@ -153,7 +156,6 @@ function List() {
                     name={event['value1']}
                     time={event['time']}
                   />
-                  <RowDivider />
                 </React.Fragment>
               );
             })}
@@ -199,7 +201,7 @@ function List() {
                 textAlign: 'center',
                 fontSize: '0.9rem',
                 fontWeight: '300',
-                color: 'GrayText',
+                color: theme.palette.text.secondary,
                 mt: 2,
               }}
             >

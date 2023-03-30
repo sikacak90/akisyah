@@ -1,4 +1,6 @@
+import { useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
+import { green, red } from '@mui/material/colors';
 import { DataGrid } from '@mui/x-data-grid';
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -34,6 +36,7 @@ const columns = [
 export default function WebhooksDataGrid({ apiRef, setSnackbar }) {
   const { session } = useContext(sessionContext);
   const navigate = useNavigate();
+  const theme = useTheme();
   useEffect(() => {
     if (session.isLoggedIn) {
       session.userData.webhooks.forEach((webhook) => {
@@ -56,15 +59,16 @@ export default function WebhooksDataGrid({ apiRef, setSnackbar }) {
         height: 460,
         width: '100%',
         marginTop: '1rem',
+        backgroundColor: theme.palette.background.default,
         '& .open': {
-          backgroundColor: 'rgba(239, 251, 244, 1)',
-          color: '#20A144',
+          backgroundColor: green[500],
+          color: theme.palette.getContrastText(green[500]),
           textAlign: 'center',
           cursor: 'pointer',
         },
         '& .close': {
-          backgroundColor: '#ff943975',
-          color: 'red',
+          backgroundColor: red[500],
+          color: theme.palette.getContrastText(red[500]),
           cursor: 'pointer',
         },
         '& .grid-row': {

@@ -1,29 +1,30 @@
-import * as React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import React from 'react';
 
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
-      main: "#409FFF",
-      contrastText: "#FFFFFF",
+      main: '#409FFF',
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: "#11cb5f",
+      main: '#11cb5f',
     },
     gray: {
-      main: "#F2F2F2",
+      main: '#F2F2F2',
     },
     darkGray: {
-      main: "#44566C",
-      contrastText: "#FFFFFF",
+      main: '#44566C',
+      contrastText: '#FFFFFF',
     },
     buttonGray: {
-      main: "#64707C3D",
-      contrastText: "#FFFFFF",
+      main: '#64707C3D',
+      contrastText: '#FFFFFF',
     },
   },
   typography: {
-    fontFamily: "Poppins",
+    fontFamily: 'Poppins',
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,

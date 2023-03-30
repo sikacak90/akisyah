@@ -13,7 +13,7 @@ import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import logo from '../assets/akisyah_logo/black.svg';
+import logo from '../assets/akisyah_logo/white.svg';
 import axios from '../utils/axios-client';
 
 const TextInputStyled = styled.input`
@@ -22,7 +22,7 @@ const TextInputStyled = styled.input`
   padding: 0.5rem;
   color: #333;
   background: ${(props) => props.theme.palette.gray.main};
-  height: 1.6rem;
+  height: 2.2rem;
 `;
 
 const InputElement = ({ field, form, ...props }) => {
@@ -95,6 +95,7 @@ function Register() {
         alignItems: 'center',
         height: '100vh',
         width: '100vw',
+        color: theme.palette.text.primary,
       }}
     >
       <Snackbar
@@ -123,10 +124,10 @@ function Register() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: 'white',
           padding: isMobile ? '2rem 1rem' : '2rem 4rem',
           width: isMobile ? '100%' : 'unset',
           borderRadius: theme.shape.borderRadius - 2,
+          background: theme.palette.background.paper,
         }}
       >
         <Box
@@ -191,8 +192,8 @@ function Register() {
               <ErrorMessage
                 name="email"
                 component={Typography}
-                color="red"
-                variant="caption"
+                color={theme.palette.error.light}
+                variant="subtitle2"
                 sx={{
                   mt: 1,
                 }}
@@ -223,8 +224,8 @@ function Register() {
               <ErrorMessage
                 component={Typography}
                 name="password"
-                color="red"
-                variant="caption"
+                color={theme.palette.error.light}
+                variant="subtitle2"
                 sx={{
                   mt: 1,
                 }}
@@ -255,8 +256,8 @@ function Register() {
               <ErrorMessage
                 component={Typography}
                 name="confirmPassword"
-                color="red"
-                variant="caption"
+                color={theme.palette.error.light}
+                variant="subtitle2"
                 sx={{
                   mt: 1,
                 }}
@@ -267,7 +268,7 @@ function Register() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginTop: '1rem',
+                marginTop: '1.4rem',
               }}
             >
               <Button

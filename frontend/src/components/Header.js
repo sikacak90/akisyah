@@ -1,4 +1,5 @@
 import MenuIcon from '@mui/icons-material/Menu';
+import { useMediaQuery } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -8,17 +9,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { styled, useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useEffect, useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import AvatarSVG from '../assets/48px.svg';
-import LogoSVG from '../assets/akisyah_logo/black.svg';
+import LogoSVG from '../assets/akisyah_logo/white.svg';
 import NotificationSVG from '../assets/Bell + Notification.svg';
 import GridSVG from '../assets/Grid.svg';
 import MenuSVG from '../assets/Menu.svg';
 import SettingSVG from '../assets/Settings.svg';
-import { useMediaQuery } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
-import { sessionContext } from "../features/Session";
+import { sessionContext } from '../features/Session';
 
 const drawerWidth = 240;
 
@@ -116,7 +116,7 @@ function Header() {
     <>
       <AppBar
         sx={{
-          background: theme.palette.gray.main,
+          background: theme.palette.background.default,
           boxShadow: 'none',
           border: 'none',
         }}
@@ -168,9 +168,12 @@ function Header() {
                   mr: 3,
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: theme.palette.darkGray.main,
+                  color: theme.palette.text.secondary,
+                  hover: {
+                    color: theme.palette.text.primary,
+                  },
                 }}
-                onClick={()=>logout()}
+                onClick={() => logout()}
               >
                 Logout
               </Box>
@@ -208,7 +211,7 @@ function Header() {
       <Drawer variant="permanent" open={open}>
         <DrawerHeader
           sx={{
-            background: theme.palette.gray.main,
+            background: theme.palette.background.default,
             border: 'none',
             px: 6,
             py: 3,
@@ -222,7 +225,7 @@ function Header() {
         </DrawerHeader>
         <List
           sx={{
-            background: theme.palette.gray.main,
+            background: theme.palette.background.default,
             border: 'none',
             height: '100%',
           }}

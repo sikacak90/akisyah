@@ -147,7 +147,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Box sx={{ display: 'flex', m: 4 }}>
+    <Box sx={{ display: 'flex', m: 4, color: theme.palette.text.primary }}>
       <CssBaseline />
       <Header />
       <Box
@@ -157,7 +157,7 @@ export default function Dashboard() {
           p: 3,
           marginTop: '3rem',
           borderRadius: '8px',
-          background: 'white',
+          background: theme.palette.background.default,
           height: '100%',
         }}
       >
@@ -189,7 +189,7 @@ export default function Dashboard() {
             <Box
               sx={{
                 background: theme.palette.error.main,
-                color: 'white',
+                color: theme.palette.error.contrastText,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
